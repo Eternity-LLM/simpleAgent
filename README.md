@@ -3,7 +3,7 @@
 ## 使用说明:
 1. 从 [官网](https://platform.deepseek.com/) 获取您的DeepSeek API。
 2. 安装Python。
-3. 下载此仓库的代码（若为`.zip`格式请解压），并在**系统命令行**执行以下代码：
+3. 下载此仓库的代码（若为压缩包请解压），并在**系统命令行**执行以下代码：
    ```bash/cmd/powershell
    pip install -r requirements.txt
    ```
