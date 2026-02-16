@@ -12,4 +12,5 @@
    pip install --update openai
    ```
 4. 运行`test.py`即可。
+
 支持读写文件，复杂任务可制定TODO待办清单。
