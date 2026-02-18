@@ -39,6 +39,11 @@ class TODOListManager:
         self.progress[self.cur_step-1] = True
         self.cur_step += 1
         return
+    
+    def redo(self)->None:
+        self.cur_step -= 1
+        self.progress[self.cur_step-1] = False
+        return
 
     def complete_all(self)->None:
         self.progress = [True for i in range(self.nsteps)]
@@ -67,7 +72,7 @@ class TODOListManager:
         if self.cur_step > self.nsteps:
             res += '\033[32m当前所有任务均已完成！\033[0m'
         else:
-            res += f'\033[33m标注[+][*][-]分别表示已完成、当前步骤、未完成步骤。\n当前正在处理的步骤为第{self.cur_step}步：\n\033[36m{self.todo[self.cur_step-1]}\n\033[0m'
+            res += f'\033[33m标注[√][→][×]分别表示已完成、当前步骤、未完成步骤。\n当前正在处理的步骤为第{self.cur_step}步：\n\033[36m{self.todo[self.cur_step-1]}\n\033[0m'
         print(res)
         return
 
@@ -118,6 +123,11 @@ class TODOListManager:
             function=self.pause_todo
         )
         return
+    
+    @property
+    def all_completed(self)->bool:
+        # Check if all steps are completed
+        return all(self.progress)
 
     def __call__(self, __func_name:str, *args, **kwargs):
         return self.function(__func_name, *args, **kwargs)

@@ -102,14 +102,19 @@ class FileManager:
                     self.files[idx] = FileManager(os.path.join(self.dir_path, file), self.level-1)
 
     def read_file(self, file_name:str) -> TextFileContent:
-        if file_name not in self.files:
-            raise ValueError(f'File {file_name} not found in directory {self.dir_path}.')
-        try:
-            with open(os.path.join(self.dir_path, file_name), 'r', encoding='utf-8') as f:
-                content = f.read()
-            return str(TextFileContent(file_name, content))
-        except:
-            return '无法打开文件。请检查文件是否存在，并且文件名是否正确。不支持查看非文本文件。'
+        # 支持直接传入相对路径，例如 'subdir/file.txt' 或多级路径
+        norm_name = os.path.normpath(file_name)
+        target_path = os.path.join(self.dir_path, norm_name)
+        # 如果目标路径存在且是文件，直接读取（支持子目录）
+        if os.path.exists(target_path) and os.path.isfile(target_path):
+            try:
+                with open(target_path, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                return str(TextFileContent(file_name, content))
+            except:
+                return '无法打开文件。请检查文件是否存在，并且文件名是否正确。不支持查看非文本文件。'
+        # 否则按照原有行为报错（文件不存在于当前管理器目录下）
+        raise ValueError(f'File {file_name} not found in directory {self.dir_path}.')
     
     def write_file(self, file_name:str, content:str) -> None:
         with open(os.path.join(self.dir_path, file_name), 'w', encoding='utf-8') as f:
