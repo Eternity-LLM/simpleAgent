@@ -10,7 +10,7 @@ class TextFileContent:
         return self.template
 
 class FileManager:
-    def __init__(self, dir_path:str, level:int=3) -> None:
+    def __init__(self, dir_path:str, level:int=3, built:bool=False) -> None:
         self.level = level
         self.dir_path = dir_path
         self.files = os.listdir(dir_path)
@@ -18,7 +18,8 @@ class FileManager:
             for idx, file in enumerate(self.files):
                 if os.path.isdir(os.path.join(dir_path, file)):
                     self.files[idx] = FileManager(os.path.join(dir_path, file), level-1)
-        self.build_function()
+        if not built:
+            self.build_function()
         return
     
     def build_function(self):
@@ -34,7 +35,7 @@ class FileManager:
         )
         self.function.add_function(
             name='write_file',
-            description='将指定内容写入指定文件，如果文件不存在则创建新文件。',
+            description='将指定内容写入指定文件（覆盖），如果文件不存在则创建新文件。',
             parameters={
                 'file_name': {'type': 'string', 'description': '要写入的文件名，可以是新文件或现有文件。'},
                 'content': {'type': 'string', 'description': '要写入文件的内容。'}
@@ -92,7 +93,20 @@ class FileManager:
             required=['dir_name'],
             function=self.view_dir
         )
+        self.function.add_function(
+            name='chdir',
+            description='（根据用户需求）更改当前目录以便查看别的文件夹。',
+            parameters={
+                'new_dir': {'type':'string', 'description':'新的文件夹地址。'}
+            },
+            required=['new_dir'],
+            function=self.chdir
+        )
         return
+    
+    def chdir(self, new_dir:str)->None:
+        print(f'[{new_dir}]')
+        self.__init__(new_dir, built=True)
     
     def refresh(self)->None:
         self.files = os.listdir(self.dir_path)
@@ -102,6 +116,7 @@ class FileManager:
                     self.files[idx] = FileManager(os.path.join(self.dir_path, file), self.level-1)
 
     def read_file(self, file_name:str) -> TextFileContent:
+        print(f'[{file_name}]')
         # 支持直接传入相对路径，例如 'subdir/file.txt' 或多级路径
         norm_name = os.path.normpath(file_name)
         target_path = os.path.join(self.dir_path, norm_name)
@@ -117,21 +132,26 @@ class FileManager:
         raise ValueError(f'File {file_name} not found in directory {self.dir_path}.')
     
     def write_file(self, file_name:str, content:str) -> None:
+        print(f'[{file_name}]')
         with open(os.path.join(self.dir_path, file_name), 'w', encoding='utf-8') as f:
             f.write(content)
         if file_name not in self.files:
             self.files.append(file_name)
     
     def view_dir(self, dir_name:str) -> str:
+        print(f'[{dir_name}]')
         dir_path = os.path.join(self.dir_path, dir_name)
         if not os.path.exists(dir_path):
             raise ValueError(f'Directory {dir_name} not found in {self.dir_path}.')
         if not os.path.isdir(dir_path):
             raise ValueError(f'{dir_name} is not a directory in {self.dir_path}.')
         sub_manager = FileManager(dir_path, 3)
-        return sub_manager.list_files()
+        dir_content = sub_manager.list_files()
+        # print(dir_content)
+        return dir_content
 
     def add_dir(self, dir_name:str) -> None:
+        print(f'[{dir_name}]')
         new_dir_path = os.path.join(self.dir_path, dir_name)
         if not os.path.exists(new_dir_path):
             os.makedirs(new_dir_path)
@@ -140,12 +160,14 @@ class FileManager:
             raise ValueError(f'Directory {dir_name} already exists in {self.dir_path}.')
     
     def delete_file(self, file_name:str) -> None:
+        print(f'[{file_name}]')
         if file_name not in self.files:
             raise ValueError(f'File {file_name} not found in directory {self.dir_path}.')
         os.remove(os.path.join(self.dir_path, file_name))
         self.files.remove(file_name)
     
     def delete_dir(self, dir_name:str) -> None:
+        print(f'[{dir_name}]')
         dir_path = os.path.join(self.dir_path, dir_name)
         if not os.path.exists(dir_path):
             raise ValueError(f'Directory {dir_name} not found in {self.dir_path}.')
@@ -162,6 +184,7 @@ class FileManager:
                 res += '  ' + file.list_files().replace('\n', '\n  ') + '\n'
             else:
                 res += f'  {file}\n'
+        print(res)
         return res
     
     def __str__(self) -> str:

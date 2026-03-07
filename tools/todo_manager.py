@@ -4,7 +4,7 @@ class TODOListManager:
     def __init__(self, todo_list:list=[])->None:
         self.todo = todo_list
         self.nsteps = len(self.todo)
-        self.progress = [False for i in range(self.nsteps)]
+        self.progress = [False for _ in range(self.nsteps)]
         self.cur_step = 1
         self.pause = False
         self.build_function()
@@ -39,11 +39,6 @@ class TODOListManager:
         self.progress[self.cur_step-1] = True
         self.cur_step += 1
         return
-    
-    def redo(self)->None:
-        self.cur_step -= 1
-        self.progress[self.cur_step-1] = False
-        return
 
     def complete_all(self)->None:
         self.progress = [True for i in range(self.nsteps)]
@@ -54,6 +49,10 @@ class TODOListManager:
         self.nsteps += 1
         self.progress += [False]
         self.todo.append(step)
+    
+    def check_todo(self)->str:
+        self.print()
+        return str(self)
 
     def print(self, color:bool=True)->None:
         if not color:
@@ -113,7 +112,7 @@ class TODOListManager:
             description='以Markdown格式查看当前待办事项列表的状态。',
             parameters={},
             required=[],
-            function=self.__str__
+            function=self.check_todo
         )
         self.function.add_function(
             name='pause_todo',

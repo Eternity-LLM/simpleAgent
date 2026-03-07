@@ -23,7 +23,18 @@ AI_TOOLS.include(fm.function)
 tools = AI_TOOLS.functions
 
 # 创建会话
-messages = [{'role':'system', 'content':'你是AI助手DeepSeek。在回答用户的问题时，你可以调用多个工具。复杂任务请调用工具编写TODO待办清单并严格按照清单推进任务。'}]
+messages = [{
+    'role':'system',
+    'content':('你是AI助手DeepSeek。在回答用户的问题时，你可以调用多个工具。'
+               '复杂任务请调用工具编写TODO待办清单并严格按照清单推进任务。'
+               '但要注意：TODO只是用于帮助你分步骤处理复杂任务的工具，'
+               '不应过长、过于详细，也不应重复步骤。如果是简单问题或单一步骤即可完成的问题，不要使用TODO列表。'
+               '这是一个简短的示例：\n'
+               '1. 修复程序中的语法错误\n'
+               '2. 检查程序存在的其他问题\n'
+               '3. 向用户汇报并确认结果'
+    )
+}]
 
 while True:
     prompt = input('\n\n\n请输入问题（输入/quit退出）：\n> ')
